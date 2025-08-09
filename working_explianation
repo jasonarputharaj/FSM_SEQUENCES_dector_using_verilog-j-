@@ -1,0 +1,43 @@
+module FSM(input din,clk,reset,output out);
+//input output ports are declared this used in module to communicate with other modulw
+parameter idel=2'b00,state1=2'b01,state2=2'b10,state3=2'b11;
+// since here we have 3 bit detector the are 4 state(overlap seceuence)
+reg [1:0] present_state,nxt_state;
+//reg are used in determiniting the state of the fsm 
+always@(posedge clk)
+if(reset)
+present_state<=idel;
+else
+present_state<=nxt_state;
+// this always bolck is used to store the state of the fsm (sequential) logic
+//combinatioal logic to deact the sequence of numbers 101
+always@(din,present_state)
+begin
+case(present_state)
+idel:if(din==1)
+nxt_state=state1;
+else
+nxt_state=idel;
+state1:if(din==0)
+nxt_state=state2;
+else
+nxt_state=state1;
+state2:if(din==1)
+nxt_state=state3;
+else
+nxt_state=state2;
+state3:if(din==1)
+nxt_state=state1;
+else
+nxt_state=state2;
+default:nxt_state=idel;
+endcase
+end
+//in sequential logic we have non_blocking assigment but in combinational logic we have blocking assigments?
+//because in sequential logic the values of register need to change at same time the values update at same time(it will wait for clk )
+//but in combinational logic not like that if we use non_blocking that will take un wanted delay (it will not wait for clk) immeadate assingment
+
+//to get the output wire is used
+assign out=(present_state==state3);
+endmodule
+
